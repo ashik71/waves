@@ -58,7 +58,7 @@ export const generateData = (formdata, formname) => {
     let dataToSubmit = {};
 
     for (let key in formdata) {
-        if (key != 'confirmpassword') {
+        if (key !== 'confirmpassword') {
             dataToSubmit[key] = formdata[key].value;
         }
     }

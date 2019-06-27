@@ -205,12 +205,14 @@ select {
     background: #f8f8f8;
     transition: all 200ms ease-in;
     cursor: pointer;
+    border-radius: 3px;
 }
 .card_link:hover,
 .bag_link:hover,
 .add_to_cart_link:hover {
-    background: #aaaaaa;
+    background: #2196f4;
     color: #ffff;
+    border-radius: 3px;
 }
 .add_to_cart_link {
     color: #6b6b6b;
