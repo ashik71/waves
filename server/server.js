@@ -44,6 +44,49 @@ app.get('/api/users/auth', auth, (req, res) => {
 //############################################################################
 
 // sort by new arrival
+app.post('/api/product/shop',(req,res)=>{
+
+    let order = req.body.order ? req.body.order : 'desc';
+    let sortBy = req.body.sortBy ? req.body.sortBy  : '_id';
+    let limit = req.body.limit ? parseInt(req.body.limit) : 100;
+    let skip = parseInt(req.body.skip);
+    let filterArg = {};
+    let _filters = req.body.filters;
+
+    console.log('before: ',_filters);
+
+    for(let key in req.body.filters){
+        if(req.body.filters[key].length > 0){
+            if(key === 'price'){
+                filterArg [key] = {
+                    $gte: req.body.filters[key][0],
+                    $lte: req.body.filters[key][1]
+                }
+            }else{
+                filterArg [key] = _filters[key];
+            }
+        } 
+    }
+console.log('After: ',filterArg);
+
+    Product.
+    find(filterArg).
+    populate('brand').
+    populate('wood').
+    sort([[sortBy,order]]).
+    skip(skip).
+    limit(limit).
+    exec((err,articles)=>{
+        if(err) return res.status(400).send(err);
+        res.status(200).json({
+            size: articles.length,
+            articles
+        })
+    })
+    
+})
+
+
 
 app.get('/api/product/articles',(req,res)=>{
     let order = req.query.order ? req.query.order: 'asc';
