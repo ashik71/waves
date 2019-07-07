@@ -1,5 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import { stat } from 'fs';
 
 const links = [
     {
@@ -16,17 +18,32 @@ const links = [
     }
 ]
 
+const admin = [
+    {
+        name: 'Site info',
+        linkTo: '/admin/site_info'
+    },
+    {
+        name: 'Add product',
+        linkTo: '/admin/add_product'
+    },
+    {
+        name: 'Manage categories',
+        linkTo: '/admin/manage_categories'
+    }
+]
+
 
 
 const UserLayout = (props) => {
 
-const generateLinks = (links) =>(
-    links.map((item,i)=>(
-        <Link to={item.linkTo} key={i}>
-        {item.name}
-        </Link>
-    ))
-)
+    const generateLinks = (links) => (
+        links.map((item, i) => (
+            <Link to={item.linkTo} key={i}>
+                {item.name}
+            </Link>
+        ))
+    )
 
     return (
         <div className="container">
@@ -36,6 +53,17 @@ const generateLinks = (links) =>(
                     <div className="links">
                         {generateLinks(links)}
                     </div>
+                    {
+                        props.user.userData.isAdmin ?
+                            <div>
+                                <h2>Admin</h2>
+                                <div className="links">
+                                    {generateLinks(admin)}
+                                </div>
+                            </div>
+                            : null
+                    }
+
                 </div>
                 <div className="user_right">
                     {props.children}
@@ -47,4 +75,11 @@ const generateLinks = (links) =>(
     );
 };
 
-export default UserLayout;
+const mapToStateProps = (state) => {
+
+    return {
+        user: state.user
+    }
+}
+
+export default connect(mapToStateProps)(UserLayout);
