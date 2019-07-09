@@ -1,9 +1,10 @@
 import React, { Component } from 'react';
 import UserLayout from '../../../hoc/userLayout';
 import FormField from '../../utils/Forms/formfield';
-import { update, generateData, isFormValid } from '../../utils/Forms/formactions';
+import { update, generateData, isFormValid, populateOptions, resetFields } from '../../utils/Forms/formactions';
 import { connect } from 'react-redux';
-import { getBrands, getWoods } from '../../../actions/product_action';
+import { getBrands, getWoods, addProduct,clearProduct } from '../../../actions/product_action';
+import FileUpload from '../../utils/Forms/fileupload';
 
 class AddProduct extends Component {
 
@@ -174,18 +175,105 @@ class AddProduct extends Component {
                 validationMessage: '',
                 showlabel: true
             },
+            images :{
+                value: [],
+                validation:{
+                    required :false
+                },
+                valid: true,
+                touched: false,
+                validationMessage: '',
+                showlabel: false
+            }
         }
     }
-    updateForm = (element) => {
-        
+
+    updateFields = (newFormFata) => {
+        this.setState({
+            formdata: newFormFata
+        })
+    }
+    componentDidMount() {
+        const formdata = this.state.formdata;
+
+        this.props.dispatch(getBrands()).then(response => {
+            const updatedFormdata = populateOptions(formdata, this.props.products.brands, 'brand');
+            this.updateFields(updatedFormdata);
+        });
+        this.props.dispatch(getWoods()).then(response => {
+            const updatedFormdata = populateOptions(formdata, this.props.products.woods, 'wood');
+            this.updateFields(updatedFormdata);
+        });
     }
 
+
+    updateForm = (element) => {
+        const newFormdata = update(element, this.state.formdata, 'product');
+        this.setState({
+            formError: false,
+            formdata: newFormdata
+        })
+    }
+    resetFieldHandler = () => {
+        const newFormdata = resetFields(this.state.formdata, 'product')
+        this.setState(
+            {
+                formdata: newFormdata,
+                formSuccess: true
+            }
+        );
+        setTimeout(() => {
+            this.setState({
+                formSuccess: false
+            },()=>{
+                this.props.dispatch(clearProduct())
+            })
+        }, (3000));
+    }
+    submitForm = (event) => {
+        event.preventDefault();
+        const dataToSubmit = generateData(this.state.formdata, 'product');
+        const isValid = isFormValid(this.state.formdata, 'product');
+        if (isValid) {
+            this.props.dispatch(addProduct(dataToSubmit)).then(() => {
+                if (this.props.products.addProduct.success) {
+                    this.resetFieldHandler();
+                } else {
+                    this.setState({ formError: true })
+                }
+            })
+
+        }
+        else {
+            this.setState({
+                formError: true
+            })
+        }
+    }
+
+    imagesHandler = (images) => {
+        const newFormData = {
+            ...this.state.formdata
+        }
+        newFormData['images'].value = images;
+        newFormData['images'].valid = true;
+
+        this.setState({
+            formdata:  newFormData
+        })
+    }
     render() {
         return (
             <UserLayout>
                 <div>
                     <h1>Add product</h1>
                     <form onSubmit={(event) => this.submitForm(event)}>
+                        
+                        <FileUpload
+                            imagesHandler = {(images)=> this.imagesHandler(images)}
+                            reset= {this.state.formSuccess}
+                        />
+                        
                         <FormField
                             id={'name'}
                             formdata={this.state.formdata.name}
@@ -237,10 +325,10 @@ class AddProduct extends Component {
                                 change={(element) => this.updateForm(element)}
                             />
                             {this.state.formSuccess ?
-                            <div className="form_success">
-                                Success..
+                                <div className="form_success">
+                                    Success..
                             </div>
-                            :null
+                                : null
                             }
                             {this.state.formError ?
                                 <div className="error_label">

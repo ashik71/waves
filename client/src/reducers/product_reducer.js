@@ -3,7 +3,9 @@ import {
     GET_PRODUCTS_BY_ARRIVAL,
     GET_BRANDS,
     GET_WOODS,
-    GET_PRODUCT_TO_SHOP
+    GET_PRODUCT_TO_SHOP,
+    ADD_PRODUCT,
+    CLEAR_PRODUCT
 } from '../actions/types';
 
 
@@ -18,7 +20,11 @@ export default function (state = {}, action) {
         case GET_WOODS:
             return { ...state, woods: action.payload }
         case GET_PRODUCT_TO_SHOP:
-            return { ...state, toShop: action.payload.articles,toShopSize: action.payload.size }
+            return { ...state, toShop: action.payload.articles, toShopSize: action.payload.size }
+        case ADD_PRODUCT:
+            return { ...state, addProduct: action.payload }
+        case CLEAR_PRODUCT:
+            return { ...state, addProduct: action.payload }
         default:
             return state;
     }

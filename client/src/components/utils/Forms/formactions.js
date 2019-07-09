@@ -73,3 +73,37 @@ export const isFormValid = (formdata, formname) => {
     }
     return isValid;
 }
+
+export const populateOptions = (formdata, array = [], field) => {
+    const newArray = [];
+    const newFormdata = { ...formdata };
+    array.forEach(item => {
+        newArray.push(
+            {
+                key: item._id,
+                value: item.name
+            }
+        );
+    });
+
+    newFormdata[field].config.options = newArray;
+
+    return newFormdata;
+
+}
+
+
+export const resetFields = (formdata, formname) => {
+    const newFormdata = { ...formdata };
+    for (let key in newFormdata) {
+        if (key === 'images') {
+            newFormdata[key].value = [];
+        } else {
+            newFormdata[key].value = '';
+        }        
+        newFormdata[key].valid = false;
+        newFormdata[key].touched = false;
+        newFormdata[key].validationMessage = '';
+    }
+    return newFormdata;
+}
