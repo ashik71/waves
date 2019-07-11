@@ -3,7 +3,9 @@ import {
     GET_PRODUCTS_BY_SELL,
     GET_PRODUCTS_BY_ARRIVAL,
     GET_BRANDS,
+    ADD_BRAND,
     GET_WOODS,
+    ADD_WOOD,
     GET_PRODUCT_TO_SHOP,
     ADD_PRODUCT,
     CLEAR_PRODUCT
@@ -94,5 +96,39 @@ export function clearProduct(){
     return {
         type: CLEAR_PRODUCT,
         payload: ''
+    }
+}
+
+export function addBrand(dataToSubmit,previousBrands) {
+    const request = axios.post(`${PRODUCT_SERVER}/brand`,dataToSubmit)
+        .then(response =>{
+            let brands = [...previousBrands, response.data.brand];
+            console.log(response.data);
+            return{
+                success: response.data.success,
+                brands
+            }
+        });
+
+    return {
+        type: ADD_BRAND,
+        payload: request
+    }
+}
+
+export function addWood(dataToSubmit,previousWoods) {
+    const request = axios.post(`${PRODUCT_SERVER}/wood`,dataToSubmit)
+        .then(response =>{
+            let woods = [...previousWoods, response.data.wood];
+            console.log(response.data);
+            return{
+                success: response.data.success,
+                woods
+            }
+        });
+
+    return {
+        type: ADD_WOOD,
+        payload: request
     }
 }
