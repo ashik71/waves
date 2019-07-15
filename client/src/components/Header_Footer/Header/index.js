@@ -53,9 +53,10 @@ class Header extends Component {
 
     cartLink = (item, i) => {
         const user = this.props.user.userData;
+        console.log('cart length->',user.cart.length);
         return (
             <div className="cart_link">
-                <span>{user.csrt ? user.cart.lenght : 0}</span>
+                <span>{user.cart ? user.cart.length : 0}</span>
                 <Link to={item.linkTo} key={i}>
                     {item.name}
                 </Link>
@@ -75,9 +76,7 @@ class Header extends Component {
     )
 
     showLinks = (type) => {
-        let list = [];
-        console.log(this.props.user.userData);
-
+        let list = [];       
         if (this.props.user.userData) {
 
             type.forEach(element => {

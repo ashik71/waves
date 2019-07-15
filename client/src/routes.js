@@ -12,6 +12,7 @@ import Auth from './hoc/auth';
 import AddProduct from './components/User/Admin/add_product';
 import ManageCategories from './components/User/Admin/manage_categories';
 import ProductDetail from './components/Product';
+import PageNotFound from './components/utils/pagenotFound';
 
 const Routes = () => {
   return (
@@ -26,6 +27,8 @@ const Routes = () => {
         <Route path="/register_login" exact component={Auth(RegisterLogin,false)} />
         <Route path="/shop" exact component={Auth(Shop,null)} />
         <Route path="/" exact component={Auth(Home,null)} />
+        <Route path="/not_found" exact component={Auth(PageNotFound,null)} />
+
       </Switch>
     </Layout>
   )

@@ -99,8 +99,7 @@ class Shop extends Component {
         })
     }
     render() {
-        const products = this.props.products;
-        console.log(this.state.filters);
+        const products = this.props.products;       
 
         return (
             <div>

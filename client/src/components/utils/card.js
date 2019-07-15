@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import MyButton from './button';
+import { connect } from 'react-redux';
+import { addToCart } from '../../actions/user_actions';
 
 class Card extends Component {
 
@@ -27,41 +29,51 @@ class Card extends Component {
                         <div className="name">{props.name}</div>
                         <div className="name">$ {props.price}</div>
                     </div>
-                
-                {
-                    props.grid ?
-                        <div className="description">
-                            <p>
-                                {props.description}
-                            </p>
+
+                    {
+                        props.grid ?
+                            <div className="description">
+                                <p>
+                                    {props.description}
+                                </p>
+                            </div>
+                            : null
+                    }
+                    <div className="actions">
+                        <div className="button_wrapp">
+                            <MyButton
+                                type="default"
+                                altClass="card_link"
+                                title="View Product"
+                                linkTo={`/product_detail/${props._id}`}
+                                addStyles={{
+                                    margin: '10px 0 0 0'
+                                }}
+                            />
                         </div>
-                        : null
-                }
-                <div className="actions">
-                    <div className="button_wrapp">
-                        <MyButton
-                            type="default"
-                            altClass="card_link"
-                            title="View Product"
-                            linkTo={`/product_detail/${props._id}`}
-                            addStyles={{
-                                margin: '10px 0 0 0'
-                            }}
-                        />
+                        <div className="button_wrapp">
+                            <MyButton
+                                type="bag_link"
+                                runAction={() => {
+                                    props.user.userData.isAuth ?
+                                    //console.log(props._id)
+                                    this.props.dispatch(addToCart(props._id))
+                                    :
+                                    console.log('need to log in')
+                                }}
+                            />
+                        </div>
                     </div>
-                    <div className="button_wrapp">
-                        <MyButton
-                            type="bag_link"
-                            runAction={() => {
-                                console.log('added to cart')
-                            }}
-                        />
-                    </div>
-                </div> 
-                </div>            
+                </div>
             </div>
         );
     }
 }
 
-export default Card;
+const mapStateToProps = (state) => {
+    return {
+        user: state.user
+    }
+}
+
+export default connect(mapStateToProps)(Card);

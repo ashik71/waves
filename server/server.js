@@ -53,65 +53,62 @@ app.get('/api/users/auth', auth, (req, res) => {
 //############################################################################
 
 // sort by new arrival
-app.post('/api/product/shop',(req,res)=>{
+app.post('/api/product/shop', (req, res) => {
 
     let order = req.body.order ? req.body.order : 'desc';
-    let sortBy = req.body.sortBy ? req.body.sortBy  : '_id';
+    let sortBy = req.body.sortBy ? req.body.sortBy : '_id';
     let limit = req.body.limit ? parseInt(req.body.limit) : 100;
     let skip = parseInt(req.body.skip);
     let filterArg = {};
-    let _filters = req.body.filters;
+    let _filters = req.body.filters;   
 
-    console.log('before: ',_filters);
-
-    for(let key in req.body.filters){
-        if(req.body.filters[key].length > 0){
-            if(key === 'price'){
-                filterArg [key] = {
+    for (let key in req.body.filters) {
+        if (req.body.filters[key].length > 0) {
+            if (key === 'price') {
+                filterArg[key] = {
                     $gte: req.body.filters[key][0],
                     $lte: req.body.filters[key][1]
                 }
-            }else{
-                filterArg [key] = _filters[key];
+            } else {
+                filterArg[key] = _filters[key];
             }
-        } 
-    }
-console.log('After: ',filterArg);
+        }
+    }    
 
     Product.
-    find(filterArg).
-    populate('brand').
-    populate('wood').
-    sort([[sortBy,order]]).
-    skip(skip).
-    limit(limit).
-    exec((err,articles)=>{
-        if(err) return res.status(400).send(err);
-        res.status(200).json({
-            size: articles.length,
-            articles
+        find(filterArg).
+        populate('brand').
+        populate('wood').
+        sort([[sortBy, order]]).
+        skip(skip).
+        limit(limit).
+        exec((err, articles) => {
+            if (err) return res.status(400).send(err);
+            res.status(200).json({
+                size: articles.length,
+                articles
+            })
         })
-    })
-    
+
 })
 
 
 
-app.get('/api/product/articles',(req,res)=>{
-    let order = req.query.order ? req.query.order: 'asc';
-    let sortBy = req.query.sortBy ? req.query.sortBy: '_id';
-    let limit = req.query.order ? parseInt(req.query.limit): 100;
+app.get('/api/product/articles', (req, res) => {
+    let order = req.query.order ? req.query.order : 'asc';
+    let sortBy = req.query.sortBy ? req.query.sortBy : '_id';
+    let limit = req.query.order ? parseInt(req.query.limit) : 100;
 
     Product.
-    find().
-    populate('brand').
-    populate('wood').
-    sort([[sortBy,order]]).
-    limit(limit).
-    exec((err,articles)=>{
-        if(err) return res.status(400).send(err);
-        res.status(200).send(articles)
-    })
+        find().
+        populate('brand').
+        populate('wood').
+        sort([[sortBy, order]]).
+        limit(limit).
+        exec((err, articles) => {
+            if (err) return res.status(400).send(err);
+            res.status(200).send(articles)
+        })
 
 })
 
@@ -119,24 +116,24 @@ app.get('/api/product/articles',(req,res)=>{
 // sort by best sell
 
 
-app.get('/api/product/articles_id',(req,res)=>{
+app.get('/api/product/articles_id', (req, res) => {
     let type = req.query.type;
     let items = req.query.id;
-    
-    if(type==="array"){        
+
+    if (type === "array") {
         let ids = items.split(',');
         items = [];
-        items = ids.map(item=>{
+        items = ids.map(item => {
             return mongoose.Types.ObjectId(item)
         })
     }
     Product.
-    find({'_id':{$in:items}}).
-    populate('brand').
-    populate('wood').
-    exec((err,docs)=>{
-        return res.status(200).send(docs)
-    })
+        find({ '_id': { $in: items } }).
+        populate('brand').
+        populate('wood').
+        exec((err, docs) => {
+            return res.status(200).send(docs)
+        })
 });
 
 app.post('/api/product/article', auth, admin, (req, res) => {
@@ -230,25 +227,60 @@ app.get('/api/users/logout', auth, (req, res) => {
 })
 
 
-app.post('/api/users/uploadimage',auth,admin,formidable(),(req,res)=>{
-    cloudinary.uploader.upload(req.files.file.path,(result)=>{
-        console.log(result);
+app.post('/api/users/uploadimage', auth, admin, formidable(), (req, res) => {
+    cloudinary.uploader.upload(req.files.file.path, (result) => {        
         res.status(200).send({
             public_id: result.public_id,
             url: result.url
         })
-    },{
-        public_id: `${Date.now()}`,
-        resource_type: 'auto'
+    }, {
+            public_id: `${Date.now()}`,
+            resource_type: 'auto'
+        })
+})
+
+app.get('/api/users/removeimage', auth, admin, (req, res) => {
+    let image_id = req.query.public_id;
+
+    cloudinary.uploader.destroy(image_id, (error, result) => {
+        if (error) return res.json({ succes: false, error });
+        res.status(200).send('ok');
     })
 })
 
-app.get('/api/users/removeimage',auth,admin,(req,res)=>{
-    let image_id = req.query.public_id;
+app.post('/api/users/addToCart', auth, (req, res) => {
+    User.findOne({ _id: req.user._id }, (err, doc) => {
+        let duplicate = false;
+        doc.cart.forEach(element => {
+            if (element.id == req.query.productId) {
+                duplicate = true;
+            }
+        });
 
-    cloudinary.uploader.destroy(image_id,(error,result)=>{
-        if(error) return res.json({succes:false,error});
-        res.status(200).send('ok');
+
+        if (duplicate) {
+
+        } else {
+            User.findOneAndUpdate(
+                { _id: req.user._id },
+                {
+                    $push: {
+                        cart: {
+                            id: mongoose.Types.ObjectId(req.query.productId),
+                            quantity: 1,
+                            date: Date.now()
+                        }
+                    }
+                },
+                { new: true },
+                (err, doc) => {
+                    if (err) return res.json({ success: false, err });
+                     res.status(200).json(doc.cart)
+                    
+                }
+            )
+        }
+
     })
 })
 

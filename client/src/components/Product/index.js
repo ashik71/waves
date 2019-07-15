@@ -6,12 +6,18 @@ import {getProductDetail, clearProductDetail} from '../../actions/product_action
 import ProductInfo from './productInfo';
 import ProductImage from './productImage';
 
+const no_product = '/images/product_not_found.png';
 
 class ProductDetail extends Component {
 
     componentDidMount(){
         const id = this.props.match.params.id;
-        this.props.dispatch(getProductDetail(id));
+        this.props.dispatch(getProductDetail(id)).then(response=>{
+            if(!this.props.products.productDetail)
+            {
+                this.props.history.push('/not_found');
+            }
+        })
     }
 
     componentWillUnmount(){
