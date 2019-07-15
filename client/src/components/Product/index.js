@@ -5,6 +5,7 @@ import {getProductDetail, clearProductDetail} from '../../actions/product_action
 
 import ProductInfo from './productInfo';
 import ProductImage from './productImage';
+import {addToCart} from '../../actions/user_actions';
 
 const no_product = '/images/product_not_found.png';
 
@@ -23,6 +24,10 @@ class ProductDetail extends Component {
     componentWillUnmount(){
         this.props.dispatch(clearProductDetail());
 
+    }
+    addToCartHandler = (id)=>{
+        console.log(id);
+        this.props.dispatch(addToCart(id))
     }
     render() {
         return (

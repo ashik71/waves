@@ -52,9 +52,8 @@ export function logoutUser(){
 }
 
 
-export function addToCart(id){
-
-        const request = axios.post(`${USER_SERVER}/addToCart?productId = ${id}`)
+export function addToCart(id){        
+        const request = axios.post(`${USER_SERVER}/addToCart?productId=${id}`)
         .then(response=>response.data);
 
         return{

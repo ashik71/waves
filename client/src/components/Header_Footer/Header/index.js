@@ -52,8 +52,7 @@ class Header extends Component {
     }
 
     cartLink = (item, i) => {
-        const user = this.props.user.userData;
-        console.log('cart length->',user.cart.length);
+        const user = this.props.user.userData;        
         return (
             <div className="cart_link">
                 <span>{user.cart ? user.cart.length : 0}</span>
