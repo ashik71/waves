@@ -1,7 +1,7 @@
 import React from 'react';
 import {Link} from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import faShoppingCart from '@fortawesome/fontawesome-free-solid/faShoppingCart'
+import faShoppingCart from '@fortawesome/fontawesome-free-solid/faShoppingCart';
 const MyButton = (props) => {
 
 const buttons = ()=>{
