@@ -5,6 +5,7 @@ const app = express();
 const mongoose = require('mongoose');
 const formidable = require('express-formidable');
 const cloudinary = require('cloudinary');
+const async =require('async');
 require('dotenv').config();
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.DATABASE);
@@ -25,6 +26,8 @@ const { User } = require('./models/user');
 const { Brand } = require('./models/brand');
 const { Wood } = require('./models/wood');
 const { Product } = require('./models/product');
+const { Payment } = require('./models/payment');
+
 
 
 
@@ -60,7 +63,7 @@ app.post('/api/product/shop', (req, res) => {
     let limit = req.body.limit ? parseInt(req.body.limit) : 100;
     let skip = parseInt(req.body.skip);
     let filterArg = {};
-    let _filters = req.body.filters;   
+    let _filters = req.body.filters;
 
     for (let key in req.body.filters) {
         if (req.body.filters[key].length > 0) {
@@ -73,7 +76,7 @@ app.post('/api/product/shop', (req, res) => {
                 filterArg[key] = _filters[key];
             }
         }
-    }    
+    }
 
     Product.
         find(filterArg).
@@ -228,7 +231,7 @@ app.get('/api/users/logout', auth, (req, res) => {
 
 
 app.post('/api/users/uploadimage', auth, admin, formidable(), (req, res) => {
-    cloudinary.uploader.upload(req.files.file.path, (result) => {        
+    cloudinary.uploader.upload(req.files.file.path, (result) => {
         res.status(200).send({
             public_id: result.public_id,
             url: result.url
@@ -260,14 +263,14 @@ app.post('/api/users/addToCart', auth, (req, res) => {
 
 
         if (duplicate) {
-            User.findOneAndUpdate(                
-                {_id:req.user._id,"cart.id":mongoose.Types.ObjectId(req.query.productId)},
-                {$inc:{"cart.$.quantity":1}},
-                {new:true},
+            User.findOneAndUpdate(
+                { _id: req.user._id, "cart.id": mongoose.Types.ObjectId(req.query.productId) },
+                { $inc: { "cart.$.quantity": 1 } },
+                { new: true },
                 (err, doc) => {
                     if (err) return res.json({ success: false, err });
-                     res.status(200).json(doc.cart)
-                    
+                    res.status(200).json(doc.cart)
+
                 }
             )
 
@@ -288,13 +291,113 @@ app.post('/api/users/addToCart', auth, (req, res) => {
                 { new: true },
                 (err, doc) => {
                     if (err) return res.json({ success: false, err });
-                     res.status(200).json(doc.cart)
-                    
+                    res.status(200).json(doc.cart)
+
                 }
             )
         }
 
     })
+})
+
+
+app.get('/api/users/removeFromCart', auth, (req, res) => {
+    User.findOneAndUpdate(
+        { _id: req.user._id },
+        {
+            "$pull":
+            {
+                "cart": {"id":mongoose.Types.ObjectId(req.query._id)}
+            }
+        },
+        {new:true},
+        (err,doc)=>{
+            let cart = doc.cart;
+            let array = cart.map(item=>{
+                return mongoose.Types.ObjectId(item.id);
+            });
+            Product
+            .find({'_id':{$in:array}})
+            .populate('brand')
+            .populate('wood')
+            .exec((err,cartDetail)=>{
+                return res.status(200).json({
+                    cartDetail,
+                    cart
+                })
+            })
+        }
+    )
+})
+app.post('/api/users/successBuy',auth,(req,res)=>{
+
+    let history = [];
+    let transactionData = {};
+
+    //user history
+
+    req.body.cartDetail.forEach((item)=>{
+        history.push({
+            DateOfPurchase: Date.now(),
+            name:item.name,
+            brand: item.brand.name,
+            id:item._id,
+            price: item.price,
+            quantity: item.quantity,
+            paymentId: req.body.paymentData.paymentID
+        })
+    })
+
+    //payment dashboard
+    transactionData.user ={
+        id:req.user._id,
+        name: req.user.name,
+        lastname: req.user.lastname,
+        email: req.user.email,
+    }
+    transactionData.data = req.body.paymentData;
+    transactionData.product = history;
+
+    User.findOneAndUpdate(
+        {_id:req.user._id},
+        {$push:{history:history},$set:{cart:[]}},
+        {new:true},
+        (err,user)=>{
+            if(err) return req.json({success:false,err});
+            const payment = new Payment(transactionData);
+            payment.save((err,doc)=>{
+                if(err) return req.json({success:false,err});
+                
+                let products = [];
+                doc.product.forEach((item)=>{
+                    products.push({id:item.id,quantity:item.quantity})
+                })
+
+                async.eachSeries(products,(item,callback)=>{
+
+                    Product.update(
+                        {_id:item.id},
+                        {$inc:{
+                            "sold":item.quantity
+                        }},
+                        {new:false},
+                        callback
+                    )
+                },(err)=>{
+                    if(err) return req.json({success:false,err});
+
+                    res.status(200).json({
+                        success:true,
+                        cart: user.cart,
+                        cartDetail:[]
+                    })
+                })
+            });
+        }
+    )
+
+
+
 })
 
 const port = process.env.port || 3001;
@@ -304,3 +407,4 @@ app.listen(port, () => {
 })
 
 
+;
