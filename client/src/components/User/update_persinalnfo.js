@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import FormField from '../utils/Forms/formfield';
-import { update, generateData, isFormValid, populateUserData } from '../utils/Forms/formactions';
+import { update, generateData, isFormValid, populateFields } from '../utils/Forms/formactions';
 import {updateUserInfo,clearUpdateUserInfo} from '../../actions/user_actions';
 
 import { connect } from 'react-redux';
@@ -60,7 +60,7 @@ class UpdatePersonalInfo extends Component {
         }
     }
     componentDidMount(){
-        const newFormdata = populateUserData(this.state.formdata,this.props.user.userData);
+        const newFormdata = populateFields(this.state.formdata,this.props.user.userData);
         this.setState({
             formdata: newFormdata
         })

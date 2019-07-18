@@ -108,7 +108,7 @@ export const resetFields = (formdata, formname) => {
     return newFormdata;
 }
 
-export const populateUserData =(formdata,userData)=>{
+export const populateFields =(formdata,userData)=>{
     
     for(let key in formdata){
         formdata[key].value = userData[key];
