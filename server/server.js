@@ -384,7 +384,7 @@ app.post('/api/users/successBuy',auth,(req,res)=>{
                         callback
                     )
                 },(err)=>{
-                    if(err) return req.json({success:false,err});
+                    if(err) return res.json({success:false,err});
 
                     res.status(200).json({
                         success:true,
@@ -395,9 +395,21 @@ app.post('/api/users/successBuy',auth,(req,res)=>{
             });
         }
     )
+})
 
-
-
+app.post('/api/users/user_profile',auth,(req,res)=>{
+    User.findOneAndUpdate(
+        {_id:req.user._id},
+        {
+            "$set":req.body
+        },
+        {new:true},
+        (err,doc)=>{
+            if(err) return res.json({success:false,err});
+            
+            return res.status(200).json({success: true})
+        }
+    )
 })
 
 const port = process.env.port || 3001;

@@ -6,7 +6,9 @@ import {
     ADD_TO_CART_USER,
     GET_CART_ITEMS_USER,
     REMOVE_CART_ITEM_USER,
-    ON_SUCCESS_BUY_USER
+    ON_SUCCESS_BUY_USER,
+    UPDATE_USER_INFO,
+    CLEAR_UPDATE_USER_INFO
 } from '../actions/types';
 
 
@@ -17,35 +19,41 @@ export default function (state = {}, action) {
         case LOGIN_USER:
             return { ...state, loginSucces: action.payload }
         case LOGOUT_USER:
-            return { ...state}
+            return { ...state }
         case AUTH_USER:
             return { ...state, userData: action.payload }
         case ADD_TO_CART_USER:
-            return{...state, userData:{
-                ...state.userData,
-                cart:action.payload
-            }}
+            return {
+                ...state, userData: {
+                    ...state.userData,
+                    cart: action.payload
+                }
+            }
         case GET_CART_ITEMS_USER:
-            return{...state, cartDetail:action.payload}
+            return { ...state, cartDetail: action.payload }
         case REMOVE_CART_ITEM_USER:
-            return{
+            return {
                 ...state,
                 cartDetail: action.payload.cartDetail,
-                userData:{
+                userData: {
                     ...state.userData,
                     cart: action.payload.cart
                 }
             }
         case ON_SUCCESS_BUY_USER:
-            return{
+            return {
                 ...state,
                 successBuy: action.payload.success,
-                userData:{
+                userData: {
                     ...state.userData,
                     cart: action.payload.cart
                 },
                 cartDetail: action.payload.cartDetail
             }
+        case UPDATE_USER_INFO:
+            return { ...state, updateUser: action.payload }
+        case CLEAR_UPDATE_USER_INFO:
+            return { ...state, updateUser: action.payload }
         default:
             return state;
     }
