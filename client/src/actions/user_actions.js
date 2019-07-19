@@ -13,7 +13,6 @@ import {
 } from './types';
 
 import { USER_SERVER,PRODUCT_SERVER } from '../components/utils/misc';
-import { func } from 'prop-types';
 
 
 export function loginUser(dataTosubmit) {

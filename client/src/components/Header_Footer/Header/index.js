@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { Link, withRouter } from 'react-router-dom';
 import { connect } from 'react-redux';
-import {logoutUser} from '../../../actions/user_actions';
+import { logoutUser } from '../../../actions/user_actions';
 
 class Header extends Component {
 
@@ -42,17 +42,16 @@ class Header extends Component {
         ]
     }
 
-    logoutHandler = ()=> {
-        this.props.dispatch(logoutUser()).then(response =>{
-            if(response.payload.success)
-            {
+    logoutHandler = () => {
+        this.props.dispatch(logoutUser()).then(response => {
+            if (response.payload.success) {
                 this.props.history.push('/');
             }
         })
     }
 
     cartLink = (item, i) => {
-        const user = this.props.user.userData;        
+        const user = this.props.user.userData;
         return (
             <div className="cart_link">
                 <span>{user.cart ? user.cart.length : 0}</span>
@@ -75,7 +74,7 @@ class Header extends Component {
     )
 
     showLinks = (type) => {
-        let list = [];       
+        let list = [];
         if (this.props.user.userData) {
 
             type.forEach(element => {
@@ -106,7 +105,9 @@ class Header extends Component {
                 <div className="container">
                     <div className="left">
                         <div className="logo">
-                            WAVES
+                            <Link to='/'>
+                                WAVES
+                            </Link>
                         </div>
                     </div>
                     <div className="right">
@@ -130,4 +131,4 @@ function mapStateToProps(state) {
     }
 }
 
-export default connect(mapStateToProps)(withRouter( Header));
+export default connect(mapStateToProps)(withRouter(Header));

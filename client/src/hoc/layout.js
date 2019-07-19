@@ -1,20 +1,39 @@
 import React, { Component } from 'react';
 import Header from '../components/Header_Footer/Header';
 import Footer from '../components/Header_Footer/Footer';
+import { connect } from 'react-redux';
+import { getSiteData } from '../actions/site_action';
 
 
 class Layout extends Component {
-    render() {
+    
+    componentDidMount() {
+        if (Object.keys(this.props.site).length === 0) {
+            this.props.dispatch(getSiteData());                     
+        }
+    }
+
+    render() {  
+        
         return (
             <div>
-                <Header/>
+                <Header />
                 <div className="page_container">
                     {this.props.children}
                 </div>
-                <Footer/>
+                <Footer 
+                    data ={this.props.site}
+                />
             </div>
         );
     }
 }
 
-export default Layout;
+
+const mapStateToProps = (state) => {
+    return {
+        site: state.site
+    }
+}
+
+export default connect(mapStateToProps)(Layout);

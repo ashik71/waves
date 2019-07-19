@@ -7,7 +7,6 @@ import ProductInfo from './productInfo';
 import ProductImage from './productImage';
 import {addToCart} from '../../actions/user_actions';
 
-const no_product = '/images/product_not_found.png';
 
 class ProductDetail extends Component {
 
