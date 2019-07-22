@@ -8,6 +8,7 @@ const cloudinary = require('cloudinary');
 const async = require('async');
 const path = require('path');
 require('dotenv').config();
+var favicon = require('serve-favicon')
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI);
 
