@@ -8,7 +8,6 @@ const cloudinary = require('cloudinary');
 const async = require('async');
 const path = require('path');
 require('dotenv').config();
-var favicon = require('serve-favicon')
 mongoose.Promise = global.Promise;
 mongoose.connect(process.env.MONGODB_URI);
 
@@ -23,7 +22,6 @@ cloudinary.config({
     api_secret: process.env.CLOUD_API_SECRET
 })
 
-app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //Models 
 const { User } = require('./models/user');
