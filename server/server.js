@@ -22,6 +22,7 @@ cloudinary.config({
     api_secret: process.env.CLOUD_API_SECRET
 })
 
+app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
 
 //Models 
 const { User } = require('./models/user');
